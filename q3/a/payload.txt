@@ -1,0 +1,37 @@
+Ht0xxXHXr888wET0eKay9LCZI5inrRXB4+0w3Iy37P8=
+
+
+regular obj dump gave buffer ioverflow
+sudo apt install binutils-riscv64-linux-gnu qemu-user-static
+
+
+riscv64-linux-gnu-objdump -d target_ > dump.txt
+dumpeed everyhting to a file
+
+we can see the main func cleesarluy and strcmp
+000000000001062a <main>:
+   1062a:	1141                	addi	sp,sp,-16
+   1062c:	e406                	sd	ra,8(sp)
+   1062e:	e022                	sd	s0,0(sp)
+   10630:	840a                	mv	s0,sp
+   10632:	7139                	addi	sp,sp,-64
+   10634:	00074517          	auipc	a0,0x74
+   10638:	94453503          	ld	a0,-1724(a0) # 83f78 <_GLOBAL_OFFSET_TABLE_+0x8>
+   1063c:	858a                	mv	a1,sp
+   1063e:	297040ef          	jal	150d4 <__scanf>
+   10642:	850a                	mv	a0,sp
+   10644:	00074597          	auipc	a1,0x74
+   10648:	93c5b583          	ld	a1,-1732(a1) # 83f80 <_GLOBAL_OFFSET_TABLE_+0x10>
+   1064c:	5f7170ef          	jal	28442 <strcmp>
+   10650:	e901                	bnez	a0,10660 <.fail>
+
+befor strcmp a0 gets the scnned string , and a1 gets the password sring , clearlty  the sring is at 83f80  in memory
+so we need the dump of data sections 
+
+riscv64-linux-gnu-objdump -s target_AzhiViper > full_dump.txt
+
+grep -A 2 "83f80" full_dump.txt   we get the global offset table at 83f80 , wehe we get references to srings in ro data 
+
+deciphering the addressesi n little endian ewe get the exact place where the string addressesi
+
+0x0005e091 , we get the strring from thee ascii
